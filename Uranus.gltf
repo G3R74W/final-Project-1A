@@ -1,0 +1,224 @@
+{
+    "asset" : {
+        "generator" : "Khronos glTF Blender I/O v1.6.16",
+        "version" : "2.0"
+    },
+    "scene" : 0,
+    "scenes" : [
+        {
+            "name" : "Scene",
+            "nodes" : [
+                0,
+                1,
+                2
+            ]
+        }
+    ],
+    "nodes" : [
+        {
+            "name" : "Camera",
+            "rotation" : [
+                0.483536034822464,
+                0.33687159419059753,
+                -0.20870360732078552,
+                0.7804827094078064
+            ],
+            "translation" : [
+                7.358891487121582,
+                4.958309173583984,
+                6.925790786743164
+            ]
+        },
+        {
+            "mesh" : 0,
+            "name" : "Icosphere",
+            "rotation" : [
+                0.522314727306366,
+                0,
+                0,
+                0.8527528047561646
+            ],
+            "scale" : [
+                9.322457313537598,
+                9.322457313537598,
+                9.322457313537598
+            ]
+        },
+        {
+            "name" : "Sun"
+        }
+    ],
+    "materials" : [
+        {
+            "doubleSided" : true,
+            "name" : "Material.001",
+            "pbrMetallicRoughness" : {
+                "baseColorFactor" : [
+                    0.011008457280695438,
+                    0.1772017627954483,
+                    0.303197979927063,
+                    1
+                ],
+                "metallicFactor" : 0,
+                "roughnessFactor" : 0.5
+            }
+        },
+        {
+            "doubleSided" : true,
+            "name" : "Material.002",
+            "pbrMetallicRoughness" : {
+                "baseColorFactor" : [
+                    0.3552461266517639,
+                    0.24978435039520264,
+                    0.36723822355270386,
+                    1
+                ],
+                "metallicFactor" : 0,
+                "roughnessFactor" : 0.5
+            }
+        }
+    ],
+    "meshes" : [
+        {
+            "name" : "Icosphere",
+            "primitives" : [
+                {
+                    "attributes" : {
+                        "POSITION" : 0,
+                        "NORMAL" : 1,
+                        "TEXCOORD_0" : 2
+                    },
+                    "indices" : 3,
+                    "material" : 0
+                },
+                {
+                    "attributes" : {
+                        "POSITION" : 4,
+                        "NORMAL" : 5,
+                        "TEXCOORD_0" : 6
+                    },
+                    "indices" : 7,
+                    "material" : 1
+                }
+            ]
+        }
+    ],
+    "accessors" : [
+        {
+            "bufferView" : 0,
+            "componentType" : 5126,
+            "count" : 24580,
+            "max" : [
+                1.2706974744796753,
+                0.99138343334198,
+                1.4423227310180664
+            ],
+            "min" : [
+                -1.0060664415359497,
+                -1.013147234916687,
+                -1.012993335723877
+            ],
+            "type" : "VEC3"
+        },
+        {
+            "bufferView" : 1,
+            "componentType" : 5126,
+            "count" : 24580,
+            "type" : "VEC3"
+        },
+        {
+            "bufferView" : 2,
+            "componentType" : 5126,
+            "count" : 24580,
+            "type" : "VEC2"
+        },
+        {
+            "bufferView" : 3,
+            "componentType" : 5123,
+            "count" : 24582,
+            "type" : "SCALAR"
+        },
+        {
+            "bufferView" : 4,
+            "componentType" : 5126,
+            "count" : 2300,
+            "max" : [
+                1.7970385551452637,
+                0.3701981008052826,
+                1.790194034576416
+            ],
+            "min" : [
+                -1.7970385551452637,
+                -0.370198130607605,
+                -1.790194034576416
+            ],
+            "type" : "VEC3"
+        },
+        {
+            "bufferView" : 5,
+            "componentType" : 5126,
+            "count" : 2300,
+            "type" : "VEC3"
+        },
+        {
+            "bufferView" : 6,
+            "componentType" : 5126,
+            "count" : 2300,
+            "type" : "VEC2"
+        },
+        {
+            "bufferView" : 7,
+            "componentType" : 5123,
+            "count" : 3450,
+            "type" : "SCALAR"
+        }
+    ],
+    "bufferViews" : [
+        {
+            "buffer" : 0,
+            "byteLength" : 294960,
+            "byteOffset" : 0
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 294960,
+            "byteOffset" : 294960
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 196640,
+            "byteOffset" : 589920
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 49164,
+            "byteOffset" : 786560
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 27600,
+            "byteOffset" : 835724
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 27600,
+            "byteOffset" : 863324
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 18400,
+            "byteOffset" : 890924
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 6900,
+            "byteOffset" : 909324
+        }
+    ],
+    "buffers" : [
+        {
+            "byteLength" : 916224,
+            "uri" : "Uranus.bin"
+        }
+    ]
+}

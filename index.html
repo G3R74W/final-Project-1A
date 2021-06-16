@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>ISS</title>
+    <link rel="stylesheet" href="style/style.css">
+</head>
+<body>
+    <div class="data">
+        <ul>
+            <p>ISS TRACKER:</p>
+            <p>altitude : <span id="alt"></span>km</p>
+            <p>Velocity : <span id="vel"></span>km/h</p>
+            <p>latitude : <span id="lat"></span>°</p>
+            <p>longitude : <span id="lon"></span>°</p>
+            
+            <p><a href="map.html">see on the map</a></p>
+        </ul>
+    </div>
+    <footer class="footer">
+        <div>
+            <ul>
+                <p>SOLAR SYSTEM: <p><span id="where"></span></p></span></p>
+            </ul>
+        </div>
+    </footer>
+  
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <script src="library/three.js"></script>
+    <script type="module" src="GLTFLoader.js"></script>
+    <script src="library/OrbitControls.js"></script>
+    <script src="library/threex.domevents.js"></script>
+
+    <script type="module">
+        
+        //récupération des données
+        const api_url = 'https://api.wheretheiss.at/v1/satellites/25544';
+
+
+
+        async function getISS() {
+            const response = await fetch(api_url);
+            const data = await response.json();
+            const { latitude, longitude, velocity, altitude } = data; 
+
+            document.getElementById('lat').textContent = latitude.toFixed(2);
+            document.getElementById('lon').textContent = longitude.toFixed(2);
+            document.getElementById('alt').textContent = altitude.toFixed(2);
+            document.getElementById('vel').textContent = velocity.toFixed(2);
+        }
+
+        setInterval(getISS, 1000);
+
+        //Nécessite de lancer le projet sur un serveur local
+        //import du loader --> permet d'importer les modeles 3D
+        import { GLTFLoader } from "./GLTFLoader.js";
+
+        //creation de la 'scene'
+        var scene = new THREE.Scene();
+        var camera = new THREE.PerspectiveCamera(75,window.innerWidth/window.innerHeight,0.1,10000);
+
+        var renderer = new THREE.WebGLRenderer();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        //creation de la skybox et import des images utilisees pour la skybox 
+        let materialArray = [];
+        let texture_front = new THREE.TextureLoader().load('images/front.png');
+        let texture_back = new THREE.TextureLoader().load('images/back.png');
+        let texture_up = new THREE.TextureLoader().load('images/up.png');
+        let texture_down = new THREE.TextureLoader().load('images/down.png');
+        let texture_right = new THREE.TextureLoader().load('images/left.png'); //images 'droite' et 'gauche' inversees.
+        let texture_left = new THREE.TextureLoader().load('images/right.png');
+
+        materialArray.push(new THREE.MeshBasicMaterial({map: texture_front}));
+        materialArray.push(new THREE.MeshBasicMaterial({map: texture_back}));
+        materialArray.push(new THREE.MeshBasicMaterial({map: texture_up}));
+        materialArray.push(new THREE.MeshBasicMaterial({map: texture_down}));
+        materialArray.push(new THREE.MeshBasicMaterial({map: texture_right}));
+        materialArray.push(new THREE.MeshBasicMaterial({map: texture_left}));
+
+
+        //permet de retourner le cube-->les textures sont à l'intérieur de la skybox
+        for(let i=0;i<6;i++){
+            materialArray[i].side = THREE.BackSide;
+        }
+
+        let skyboxGeo = new THREE.BoxGeometry(6000,6000,6000);
+        let skybox = new THREE.Mesh(skyboxGeo, materialArray);
+        scene.add(skybox);
+
+        //import des modèles 3D
+
+        //utilisation du GLTFLoader pour importer les modeles 3D
+        var loader = new GLTFLoader();
+
+
+        //import du modele 3D de la terre
+        var earth;
+        loader.load("earth2.gltf", function(gltf){
+            earth = gltf.scene;
+
+            //positionement de la Terre
+            gltf.scene.position.set(-5.5,0,0);
+            scene.add(gltf.scene);
+        });
+
+        
+        //import du modele 3D de l'iss
+        var iss;
+        loader.load("ISScolo.gltf", function(gltf){
+            iss = gltf.scene;
+            scene.add(gltf.scene);
+
+        });
+        
+        //import de la lune
+        var moon;
+        loader.load("Lune.gltf", function(gltf){
+            moon = gltf.scene;
+            gltf.scene.position.set(-23,0,10);
+            scene.add(gltf.scene);            
+        })
+
+        //import de hubble
+        var hubble;
+        loader.load("Hubble.gltf", function(gltf){
+            hubble = gltf.scene;
+            gltf.scene.position.set(-5.5,0,10);
+            scene.add(gltf.scene);
+        })
+
+        //import du soleil
+        var sun;
+        loader.load("sun.gltf", function(gltf){
+            sun = gltf.scene;
+            gltf.scene.position.set(300,0,0);
+            scene.add(gltf.scene);
+        })
+
+        //import de mars
+        var mars;
+        loader.load("Mars.gltf", function(gltf){
+            mars = gltf.scene;
+            gltf.scene.position.set(-50,0,0);
+            scene.add(gltf.scene);
+        })
+
+        //import de venus
+        var venus;
+        loader.load("Venus.gltf", function(gltf){
+            venus = gltf.scene;
+            gltf.scene.position.set(50,0,0);
+            scene.add(gltf.scene);
+        })
+
+        //import de mercure
+        var mercury;
+        loader.load("Mercure.gltf", function(gltf){
+            mercury = gltf.scene;
+            gltf.scene.position.set(100,0,0);
+            scene.add(gltf.scene);
+        })
+
+        //import de Jupiter
+        var jupiter;
+        loader.load("Jupiter.gltf", function(gltf){
+            jupiter = gltf.scene;
+            gltf.scene.position.set(-150,0,0);
+            scene.add(gltf.scene);
+        })
+
+        //import de Jupiter
+        var saturne;
+        loader.load("Saturne.gltf", function(gltf){
+            saturne = gltf.scene;
+            gltf.scene.position.set(-250,0,0);
+            scene.add(gltf.scene);
+        })
+
+        //import de Jupiter
+        var uranus;
+        loader.load("Uranus.gltf", function(gltf){
+            uranus = gltf.scene;
+            gltf.scene.position.set(-350,0,0);
+            scene.add(gltf.scene);
+        })
+
+        //import de Neptune
+        var neptune;
+        loader.load("Neptune.gltf", function(gltf){
+            neptune = gltf.scene;
+            gltf.scene.position.set(-450,0,0);
+            scene.add(gltf.scene);
+        })
+
+        //lumière et couleur de fond 
+        var lights = new THREE.HemisphereLight(0xffffff, 0x000000, 3.5);
+        lights.position.set(300,0,0);
+        scene.add(lights);
+
+        //position de la caméra
+        camera.position.set(-44.6,27.76,-13.5);
+
+        //utilisation du module ThreeJS OrbitControls 
+        var controls = new THREE.OrbitControls(camera, renderer.domElement);
+        //empeche l'utilisateur de 'sortir' de la skybox
+        controls.maxDistance = 700;
+        
+
+
+        //hit box
+
+        //hit box de l'ISS
+        const geometry = new THREE.SphereGeometry( 0.7, 100, 100 );
+        const material = new THREE.MeshBasicMaterial( { 
+            color: 0xffff00,
+            opacity: 0,
+            transparent: true, 
+        });
+        const sphere = new THREE.Mesh( geometry, material );
+        scene.add( sphere );
+
+        //hit box de la Terre
+        const Egeometry = new THREE.SphereGeometry(4.5, 100, 100 );
+        const Ematerial = new THREE.MeshBasicMaterial( {
+            color: 0xffff00,
+            opacity: 0,
+            transparent: true, 
+        });
+        const Esphere = new THREE.Mesh( Egeometry, Ematerial );
+        Esphere.position.set(100,10,0);
+        scene.add( Esphere );
+
+        //hit box de hubble
+        const Hgeometry = new THREE.SphereGeometry(0.5, 100, 100 );
+        const Hmaterial = new THREE.MeshBasicMaterial( {
+            color: 0xffff00,
+            opacity: 0,
+            transparent: true,
+
+        });
+        const Hsphere = new THREE.Mesh( Hgeometry, Hmaterial );
+        Esphere.position.set(-10,0 ,0);
+        scene.add( Hsphere );
+
+        //hit box de la lune
+        const Lgeometry = new THREE.SphereGeometry(2.5, 100, 100 );
+        const Lmaterial = new THREE.MeshBasicMaterial( {
+            color: 0xffff00,
+            opacity: 0,
+            transparent: true,
+        });
+        const Lsphere = new THREE.Mesh( Lgeometry, Lmaterial );
+        Lsphere.position.set(-10,0 ,0);
+        scene.add( Lsphere );
+
+        //hit box du Soleil
+        const Sgeometry = new THREE.SphereGeometry(47, 100, 100 );
+        const Smaterial = new THREE.MeshBasicMaterial( {
+            color: 0xffff00,
+            opacity: 0,
+            transparent: true, 
+        });
+        const Ssphere = new THREE.Mesh( Sgeometry, Smaterial );
+        Ssphere.position.set(300,0 ,0);
+        scene.add( Ssphere );
+
+        //hit box de mars
+        const Mgeometry = new THREE.SphereGeometry(5, 100, 100 );
+        const Mmaterial = new THREE.MeshBasicMaterial( {
+            color: 0xffff00,
+            opacity: 0,
+            transparent: true, 
+        });
+        const Msphere = new THREE.Mesh( Mgeometry, Mmaterial );
+        Msphere.position.set(-50,0 ,0);
+        scene.add( Msphere );
+
+        //hit box de Jupiter
+        const Jgeometry = new THREE.SphereGeometry(20, 100, 100 );
+        const Jmaterial = new THREE.MeshBasicMaterial( {
+            color: 0xffff00,
+            opacity: 0,
+            transparent: true, 
+        });
+        const Jsphere = new THREE.Mesh( Jgeometry, Jmaterial );
+        Jsphere.position.set(-150,0 ,0);
+        scene.add( Jsphere );
+
+        //hit box de Saturne
+        const Sageometry = new THREE.SphereGeometry(20, 100, 100 );
+        const Samaterial = new THREE.MeshBasicMaterial( {
+            color: 0xffff00,
+            opacity: 0,
+            transparent: true, 
+        });
+        const Sasphere = new THREE.Mesh( Sageometry, Samaterial );
+        Sasphere.position.set(-250,0 ,0);
+        scene.add( Sasphere );
+
+        //hit box de Uranus
+        const Ugeometry = new THREE.SphereGeometry(15, 100, 100 );
+        const Umaterial = new THREE.MeshBasicMaterial( {
+            color: 0xffff00,
+            opacity: 0,
+            transparent: true, 
+        });
+        const Usphere = new THREE.Mesh( Ugeometry, Umaterial );
+        Usphere.position.set(-350,0 ,0);
+        scene.add( Usphere );
+
+        //hit box de neptune
+        const Ngeometry = new THREE.SphereGeometry(12, 100, 100 );
+        const Nmaterial = new THREE.MeshBasicMaterial( {
+            color: 0xffff00,
+            opacity: 0,
+            transparent: true, 
+        });
+        const Nsphere = new THREE.Mesh( Ngeometry, Nmaterial );
+        Nsphere.position.set(-450,0 ,0);
+        scene.add( Nsphere );
+
+        //hit box de venus
+        const Vgeometry = new THREE.SphereGeometry(4, 100, 100 );
+        const Vmaterial = new THREE.MeshBasicMaterial( {
+            color: 0xffff00,
+            opacity: 0,
+            transparent: true, 
+        });
+        const Vsphere = new THREE.Mesh( Vgeometry, Vmaterial );
+        Vsphere.position.set(50,0 ,0);
+        scene.add( Vsphere );
+
+        //hit box de mercure
+        const Megeometry = new THREE.SphereGeometry(4, 100, 100 );
+        const Mematerial = new THREE.MeshBasicMaterial( {
+            color: 0xffff00,
+            opacity: 0,
+            transparent: true, 
+        });
+        const Mesphere = new THREE.Mesh( Megeometry, Mematerial );
+        Mesphere.position.set(100,0 ,0);
+        scene.add( Mesphere );
+
+
+
+        //Events
+
+        //ajout des events sur l'iss
+        const domEvents = new THREEx.DomEvents( camera, renderer.domElement);
+        domEvents.addEventListener(sphere, 'click', event => {
+            console.log("ISS clicked");
+            document.getElementById('where').textContent = "ISS";
+
+        });
+
+        //event de la terre
+        const EarthEvents = new THREEx.DomEvents( camera, renderer.domElement);
+        EarthEvents.addEventListener(Esphere, 'click', event => {
+            console.log("Earth clicked");
+            document.getElementById('where').textContent = "EARTH";
+            camera.position.set(-27.25, 5, -2);
+            camera.lookAt( -5.5, 0, 0 );
+        })
+
+        //event de hubble
+        const HubbleEvents = new THREEx.DomEvents( camera, renderer.domElement);
+        HubbleEvents.addEventListener(Hsphere, 'click', event => {
+            console.log("Hubble clicked");
+            document.getElementById('where').textContent = "HUBBLE SPACE TELESCOPE";
+            camera.position.set(hubble.position.x+5, hubble.position.y+5, hubble.position.z+5);
+            camera.lookAt( hubble.position.x, hubble.position.y, hubble.position.z );
+        })
+
+        //event de la lune
+        const MoonEvents = new THREEx.DomEvents( camera, renderer.domElement);
+        MoonEvents.addEventListener(Lsphere, 'click', event => {
+            console.log("Moon clicked");
+            document.getElementById('where').textContent = "MOON";
+            camera.position.set(moon.position.x+7, moon.position.y+7, moon.position.z+7);
+            camera.lookAt( moon.position.x, moon.position.y, moon.position.z );
+        })
+
+        //event du soleil
+        const SunEvents = new THREEx.DomEvents( camera, renderer.domElement);
+        SunEvents.addEventListener(Ssphere, 'click', event => {
+            console.log("Sun clicked");
+            document.getElementById('where').textContent = "SUN";
+            camera.position.set(sun.position.x+80, sun.position.y+80, sun.position.z+80);
+            camera.lookAt( sun.position.x, sun.position.y, sun.position.z );
+        })
+
+        //event de Mars
+        const MarsEvents = new THREEx.DomEvents( camera, renderer.domElement);
+        MarsEvents.addEventListener(Msphere, 'click', event => {
+            console.log("Mars clicked");
+            document.getElementById('where').textContent = "MARS";
+            camera.position.set(mars.position.x+10, mars.position.y+10, mars.position.z+10);
+            camera.lookAt( mars.position.x, mars.position.y, mars.position.z );
+        })
+
+        //event de Jupiter
+        const JupiterEvents = new THREEx.DomEvents( camera, renderer.domElement);
+        JupiterEvents.addEventListener(Jsphere, 'click', event => {
+            console.log("Jupiter clicked");
+            document.getElementById('where').textContent = "JUPITER";
+            camera.position.set(jupiter.position.x+30, jupiter.position.y+30, jupiter.position.z+30);
+            camera.lookAt( jupiter.position.x, jupiter.position.y, jupiter.position.z );
+        })
+
+        
+        //event de Saturne
+        const SaturneEvents = new THREEx.DomEvents( camera, renderer.domElement);
+        SaturneEvents.addEventListener(Sasphere, 'click', event => {
+            console.log("Saturne clicked");
+            document.getElementById('where').textContent = "SATURN";
+            camera.position.set(saturne.position.x+30, saturne.position.y+30, saturne.position.z+30);
+            camera.lookAt( saturne.position.x, saturne.position.y, saturne.position.z );
+        })
+
+        //event de Uranus
+        const UranusEvents = new THREEx.DomEvents( camera, renderer.domElement);
+        UranusEvents.addEventListener(Usphere, 'click', event => {
+            console.log("Uranus clicked");
+            document.getElementById('where').textContent = "URANUS";
+            camera.position.set(uranus.position.x+30, uranus.position.y+30, uranus.position.z+30);
+            camera.lookAt( uranus.position.x, uranus.position.y, uranus.position.z );
+        })
+
+        //event de Neptune
+        const NeptuneEvents = new THREEx.DomEvents( camera, renderer.domElement);
+        NeptuneEvents.addEventListener(Nsphere, 'click', event => {
+            console.log("Neptune clicked");
+            document.getElementById('where').textContent = "NEPTUNE";
+            camera.position.set(neptune.position.x+30, neptune.position.y+30, neptune.position.z+30);
+            camera.lookAt( neptune.position.x, neptune.position.y, neptune.position.z );
+        })
+
+        //event de Venus
+        const VenusEvents = new THREEx.DomEvents( camera, renderer.domElement);
+        VenusEvents.addEventListener(Vsphere, 'click', event => {
+            console.log("Venus clicked");
+            document.getElementById('where').textContent = "VENUS";
+            camera.position.set(venus.position.x+20, venus.position.y+20, venus.position.z+20);
+            camera.lookAt( venus.position.x, venus.position.y, venus.position.z );
+        })
+
+        //event de Mercure
+        const MercureEvents = new THREEx.DomEvents( camera, renderer.domElement);
+        MercureEvents.addEventListener(Mesphere, 'click', event => {
+            console.log("Mercury clicked");
+            document.getElementById('where').textContent = "MERCURY";
+            camera.position.set(mercury.position.x+10, mercury.position.y+10, mercury.position.z+10);
+            camera.lookAt( mercury.position.x, mercury.position.y, mercury.position.z );
+        })
+
+
+
+
+
+
+        //orbites
+
+        //affichage de l'orbite de l'iss
+        const geometry2 = new THREE.TorusGeometry( 6, 0.02, 10, 100 );
+        const material2 = new THREE.MeshBasicMaterial( { color: 0xffffff } );
+        const orbit = new THREE.Mesh( geometry2, material2 );
+        scene.add( orbit );
+
+
+        //orbite de la lune
+        const geometry3 = new THREE.TorusGeometry( 20, 0.02, 10, 100 );
+        const material3 = new THREE.MeshBasicMaterial( { color: 0xffffff } );
+        const orbit2 = new THREE.Mesh( geometry3, material3 );
+        scene.add( orbit2 );
+
+
+        //orbite de hubble
+        const geometry4 = new THREE.TorusGeometry( 10, 0.02, 10, 100 );
+        const material4 = new THREE.MeshBasicMaterial( { color: 0xffffff } );
+        const orbit3 = new THREE.Mesh( geometry4, material4 );
+        scene.add( orbit3 );
+
+        //orbite de mars
+        const geometry5 = new THREE.TorusGeometry( 350, 0.2, 10, 1000 );
+        const material5 = new THREE.MeshBasicMaterial( { color: 0xffffff } );
+        const orbit4 = new THREE.Mesh( geometry5, material5 );
+        scene.add( orbit4 );
+
+        //orbite de Venus
+        const geometry6 = new THREE.TorusGeometry( 250, 0.2, 10, 1000 );
+        const material6 = new THREE.MeshBasicMaterial( { color: 0xffffff } );
+        const orbit5 = new THREE.Mesh( geometry6, material6 );
+        scene.add( orbit5 );
+
+        //orbite de Mercure
+        const geometry7 = new THREE.TorusGeometry( 200, 0.2, 10, 1000 );
+        const material7 = new THREE.MeshBasicMaterial( { color: 0xffffff } );
+        const orbit6 = new THREE.Mesh( geometry7, material7 );
+        scene.add( orbit6 );
+        
+        //orbite de Jupiter
+        const geometry8 = new THREE.TorusGeometry( 450, 0.2, 10, 1000 );
+        const material8 = new THREE.MeshBasicMaterial( { color: 0xffffff } );
+        const orbit7 = new THREE.Mesh( geometry8, material8 );
+        scene.add( orbit7 );
+
+        //orbite de Saturne
+        const geometry9 = new THREE.TorusGeometry( 550, 0.2, 10, 1000 );
+        const material9 = new THREE.MeshBasicMaterial( { color: 0xffffff } );
+        const orbit8 = new THREE.Mesh( geometry9, material9 );
+        scene.add( orbit8 );
+
+        //orbite de Saturne
+        const geometry10 = new THREE.TorusGeometry( 650, 0.2, 10, 1000 );
+        const material10 = new THREE.MeshBasicMaterial( { color: 0xffffff } );
+        const orbit9 = new THREE.Mesh( geometry10, material10 );
+        scene.add( orbit9 );
+
+        //orbite de Neptune
+        const geometry11 = new THREE.TorusGeometry( 750, 0.2, 10, 1000 );
+        const material11 = new THREE.MeshBasicMaterial( { color: 0xffffff } );
+        const orbit10 = new THREE.Mesh( geometry11, material11 );
+        scene.add( orbit10 );
+
+
+        //positionnement des orbites
+        orbit.position.set(-5.5,0,0);
+        orbit2.position.set(-5.5,0,0);
+        orbit3.position.set(-5.5,0,0);
+        orbit4.position.set(300,0,0);
+        orbit5.position.set(300,0,0);
+        orbit6.position.set(300,0,0);
+        orbit7.position.set(300,0,0);
+        orbit8.position.set(300,0,0);
+        orbit9.position.set(300,0,0);
+        orbit10.position.set(300,0,0);
+
+
+        
+        //variables pour l'orbite
+        var alpha = 0;
+        var beta = 0;
+        var eta = 0;
+        var epsylon = 0;
+        var zeta = 0; 
+        var kappa =0;
+        var blabla = 0;
+        var bloblo = 0;
+
+        const radius = 6;
+        const radius2 = 20;
+        const radiusHubble = 10;
+        const radiusMars = 350;
+        const radiusVenus = 250;
+        const radiusMercury = 200; 
+        const radiusJupiter = 450;
+        const radiusSaturne = 550;
+        const radiusUrnanus = 650;
+        const radiusNeptune = 750;
+        let theta, lambda, gamma, delta, astra, mu, nabla, nu;  
+ 
+
+        //fonction animer
+        function animate(){
+            requestAnimationFrame(animate);
+            
+            //rotation de la Terre 
+            earth.rotation.y += 0.001;
+
+            //creation de l'orbite
+
+            //evolution de l'anngle theta
+            if(alpha < 360){
+                alpha += 0.15;
+                theta = alpha*(Math.PI/180);
+            }
+
+            if(beta < 360){
+                beta += 0.05;
+                lambda = beta*(Math.PI/180);
+            }
+
+            if(eta < 360) {
+                eta += 0.03;
+                gamma = eta*(Math.PI/180); 
+            }
+
+            if(epsylon < 360) {
+                epsylon += 0.07;
+                delta = epsylon*(Math.PI/180); 
+            }
+
+            if(zeta < 360) {
+                zeta += 0.02;
+                astra = zeta*(Math.PI/180); 
+            }
+
+            if(kappa < 360) {
+                kappa += 0.01;
+                mu = kappa*(Math.PI/180); 
+            }
+
+            if(blabla < 360) {
+                blabla += 0.008;
+                nabla = blabla*(Math.PI/180); 
+            }
+
+            if(bloblo < 360) {
+                bloblo += 0.006;
+                nu = bloblo*(Math.PI/180); 
+            }
+
+
+            //apres un tour complet (360°), l'angle repasse a 0
+            if(alpha>=360){
+                alpha = 0;
+            }
+
+            if(beta>=360){
+                beta = 0;
+            }
+
+            if(eta>=360){
+                eta = 0;
+            }
+            if(epsylon>=360){
+                epsylon = 0;
+            }
+
+            if(zeta>=360){
+                zeta = 0;
+            }            
+            
+            if(kappa>=360){
+                kappa = 0;
+            }
+
+            if(blabla>=360){
+                blabla = 0;
+            }
+
+            if(bloblo>=360){
+                bloblo = 0;
+            }
+
+
+            //trajectoire circulaire autour de la Terre de l'iss
+            iss.position.x = radius*Math.cos(theta);
+            iss.position.y = radius*Math.sin(theta);
+
+            orbit2.rotation.x = 54.99;
+            orbit3.rotation.x = 54.99;
+            orbit4.rotation.x = 54.98;
+            orbit5.rotation.x = 54.98;
+            orbit6.rotation.x = 54.98;
+            orbit7.rotation.x = 54.98;
+            orbit8.rotation.x = 54.98;
+            orbit9.rotation.x = 54.98;
+            orbit10.rotation.x = 54.98;
+
+            
+            //rotations
+            
+            //rotation de la lune
+            moon.position.x = radius2*Math.cos(lambda)-5.5;
+            moon.position.z = radius2*Math.sin(lambda);
+
+            //rotation de hubble
+            hubble.position.x = radiusHubble*Math.cos(theta)-5.5;
+            hubble.position.z = radiusHubble*Math.sin(theta);
+
+            
+            //rotation de mars
+            mars.position.x = radiusMars*Math.cos(gamma)+300;
+            mars.position.z = radiusMars*Math.sin(gamma);
+            
+            //rotation de venus
+            venus.position.x = radiusVenus*Math.cos(lambda)+300;
+            venus.position.z = radiusVenus*Math.sin(lambda);
+            
+            //rotation de Mercure
+            mercury.position.x = radiusMercury*Math.cos(delta)+300;
+            mercury.position.z = radiusMercury*Math.sin(delta);
+            
+            //rotation de Jupiter
+            jupiter.position.x = radiusJupiter*Math.cos(astra)+300;
+            jupiter.position.z = radiusJupiter*Math.sin(astra);
+            
+            //rotation de Saturne
+            saturne.position.x = radiusSaturne*Math.cos(mu)+300;
+            saturne.position.z = radiusSaturne*Math.sin(mu);           
+            
+            
+            //rotation de Uranus
+            uranus.position.x = radiusUrnanus*Math.cos(nabla)+300;
+            uranus.position.z = radiusUrnanus*Math.sin(nabla);
+            
+            
+            //rotation de Neptune
+            neptune.position.x = radiusNeptune*Math.cos(nu)+300;
+            neptune.position.z = radiusNeptune*Math.sin(nu);
+            
+            
+            //on fait en sorte que hubble soit toujours dirigé vers la terre
+            hubble.rotation.y -= 0.0026;
+
+
+            //trajectoire des hit box
+
+            //hit box de la terre
+            Esphere.position.x = earth.position.x;
+            Esphere.position.y = earth.position.y;
+            Esphere.position.z = earth.position.z;
+
+            //ajustement de la position de la hitbox (sphere) a la position de l'ISS
+            sphere.position.x = iss.position.x - 5.5;
+            sphere.position.y = iss.position.y;
+            sphere.position.z = iss.position.z;
+
+            //Ajustement de la position de la Hitbox de hubble
+            Hsphere.position.x = hubble.position.x;
+            Hsphere.position.y = hubble.position.y;
+            Hsphere.position.z = hubble.position.z;
+
+            //Ajustement de la position de la Hitbox de la lune
+            Lsphere.position.x = moon.position.x;
+            Lsphere.position.y = moon.position.y;
+            Lsphere.position.z = moon.position.z;
+
+            //Ajustement de la position de la Hitbox de Mars
+            Msphere.position.x = mars.position.x;
+            Msphere.position.y = mars.position.y;
+            Msphere.position.z = mars.position.z;
+
+            //Ajustement de la position de la Hitbox de Jupiter
+            Jsphere.position.x = jupiter.position.x;
+            Jsphere.position.y = jupiter.position.y;
+            Jsphere.position.z = jupiter.position.z;
+
+            //Ajustement de la position de la Hitbox de Saturne
+            Sasphere.position.x = saturne.position.x;
+            Sasphere.position.y = saturne.position.y;
+            Sasphere.position.z = saturne.position.z;
+
+            //Ajustement de la position de la Hitbox de Uranus
+            Usphere.position.x = uranus.position.x;
+            Usphere.position.y = uranus.position.y;
+            Usphere.position.z = uranus.position.z;
+
+            //Ajustement de la position de la Hitbox de Neptune
+            Nsphere.position.x = neptune.position.x;
+            Nsphere.position.y = neptune.position.y;
+            Nsphere.position.z = neptune.position.z;
+
+            
+            //Ajustement de la position de la Hitbox de Venus
+            Vsphere.position.x = venus.position.x;
+            Vsphere.position.y = venus.position.y;
+            Vsphere.position.z = venus.position.z;
+
+            //Ajustement de la position de la Hitbox de Mercure
+            Mesphere.position.x = mercury.position.x;
+            Mesphere.position.y = mercury.position.y;
+            Mesphere.position.z = mercury.position.z;
+
+
+            renderer.render(scene, camera);
+
+            //console.log(camera.position);
+
+        }
+
+        animate();
+    </script>
+
+</body>
+</html>
